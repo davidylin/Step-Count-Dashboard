@@ -1,0 +1,9 @@
+let
+    Source = Csv.Document(File.Contents("/*add absolute path*/\Timeline.csv"),[Delimiter=",", Columns=3, Encoding=1252, QuoteStyle=QuoteStyle.None]),
+    #"Promoted Headers" = Table.PromoteHeaders(Source, [PromoteAllScalars=true]),
+    #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers",{{"Time", type datetimezone}, {"Longitude", type number}, {"Latitude", type number}}),
+  // important step to convert the iso datetime into a date, helps for viewing exported data to excel
+    #"Extracted Date" = Table.TransformColumns(#"Changed Type",{{"Time", DateTime.Date, type date}}),
+    #"Removed Duplicates" = Table.Distinct(#"Extracted Date", {"Time"})
+in
+    #"Removed Duplicates"
